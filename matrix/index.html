@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<title>Total Killed Matrix</title>
+</head>
+<style>
+
+body{
+		text-align: center;
+	}
+.label{
+		text-align: left;
+}
+.accident-type{
+	border-radius: 4px;
+	border: none;
+	color: white;
+	padding: 5px 10px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 14px;
+	margin: 4px 2px;
+	cursor: pointer;
+	background: #bfbfbf;
+	font-family: 'Helvetica', 'Arial', sans-serif;
+	font-weight: bold;
+}
+.axis path, .axis line {
+  fill: none;
+  stroke: #bfbfbf;
+	stroke-width: 0.1px;
+  shape-rendering: crispEdges;
+}
+.browser text {
+  text-anchor: end;
+}
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+button:focus {outline:0;}
+
+</style>
+<body>
+<script src="../scripts/jquery-3.1.1.min.js"></script>
+<script src="../scripts/d3.v3.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
+
+<div class="container" style="margin-top: 20px;">
+				<div class="row">
+						<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+								<div class="post-preview">
+									<button class="accident-type" id="select-all" style="background:#2b2b2b;">ALL</button>
+									<button class="accident-type" id="ABORTIONS-CHILD-BIRTH">ABORTIONS/CHILD BIRTH</button>
+									<button class="accident-type" id="TOTAL-DROWNING">DROWNING</button>
+									<button class="accident-type" id="ELECTROCUTION">ELECTROCUTION</button>
+									<button class="accident-type" id="EPILEPTIC-FITS-GIDDINESS">EPILEPTIC FITS</button>
+									<button class="accident-type" id="FIRE-ARMS">FIRE ARMS</button>
+									<button class="accident-type" id="TOTAL-FIRE">FIRE</button>
+									<button class="accident-type" id="TOTAL-FALLS">FALLS</button>
+									<button class="accident-type" id="FOOD-POISIONING-ACCIDENTAL-INTAKE-OF-INSECTICIDES-ETC">FOOD POISIONING</button>
+									<button class="accident-type" id="GAS-CYLINDER-STOVE-BURST">GAS CYLINDER</button>
+									<button class="accident-type" id="SUDDEN-DEATHS-HEART-ATTACKS-">HEART ATTACKS</button>
+									<button class="accident-type" id="INFLUENCE-OF-ALCOHOL">INFLUENCE OF ALCOHOL</button>
+									<button class="accident-type" id="OTHER">OTHER</button>
+									<button class="accident-type" id="TOTAL-POISONING">POISONING</button>
+									<button class="accident-type" id="OTHER-RAILWAY-ACCIDENTS">RAILWAY ACCIDENTS</button>
+									<button class="accident-type" id="SNAKE-BITE-ANIMAL-BITE">SNAKE/ANIMAL BITE</button>
+									<button class="accident-type" id="TOTAL-SUDDEN-DEATHS">SUDDEN DEATHS</button>
+
+									</div>
+								<hr>
+						</div>
+				</div>
+		</div>
+
+<div id="matrix"></div>
+<script>
+
+var color = {
+    "ANDHRA PRADESH": "#fdae61",
+    "ARUNACHAL PRADESH": "#f89f5f",
+    "ASSAM": "#f48f5d",
+    "BIHAR": "#ef805b",
+    "CHHATTISGARH": "#ea7159",
+    "GOA": "#e86958",
+    "GUJARAT": "#e66157",
+    "HARYANA": "#e15255",
+    'HIMACHAL PRADESH': "#dd5e5c",
+    'JAMMU & KASHMIR': "#d47569",
+    "JHARKHAND": "#ca8c76",
+    "KARNATAKA": "#c1a383",
+    "KERALA": "#b8ba90",
+    "MADHYA PRADESH": "#b0d19d",
+    "MAHARASHTRA": "#abdda4",
+    "MANIPUR": "#a0d5a6",
+    "MEGHALAYA": "#8bc7aa",
+    "MIZORAM": "#76b7ad",
+    "NAGALAND": '#60a8b1',
+    'ODISHA': "#4b9ab4",
+    "PUNJAB": '#368bb8',
+    "RAJASTHAN": "#2b83ba",
+    "SIKKIM": "#2778ab",
+    "TAMIL NADU": "#20628b",
+    "TRIPURA": "#194c6d",
+    "UTTAR PRADESH": "#12374e",
+    "UTTARAKHAND": "#0b212e",
+    "WEST BENGAL": "#040b0f",
+    "A & N ISLANDS": "#000000",
+    "CHANDIGARH": "#151515",
+    "D & N HAVELI": "#2b2b2b",
+    "DAMAN & DIU": "#404040",
+    "DELHI(UT)": "#555555",
+    "LAKSHADWEEP": "#6a6a6a",
+    "PUDUCHERRY": "#808080"
+};
+var circles = [];
+var text_labels = [];
+var chart_data, stream_data, area_stack, total_data;
+var line_tips = []
+var word_active = {
+    'ELECTROCUTION': true,
+    'GAS-CYLINDER-STOVE-BURST': true,
+    'FIRE-ARMS': true,
+    "SUDDEN-DEATHS-HEART-ATTACKS-": true,
+    "EPILEPTIC-FITS-GIDDINESS": true,
+    "ABORTIONS-CHILD-BIRTH": true,
+    "INFLUENCE-OF-ALCOHOL": true,
+    "FOOD-POISIONING-ACCIDENTAL-INTAKE-OF-INSECTICIDES-ETC": true,
+    "SNAKE-BITE-ANIMAL-BITE": true,
+    "OTHER-RAILWAY-ACCIDENTS": true,
+    "TOTAL-DROWNING": true,
+    "TOTAL-FALLS": true,
+    "TOTAL-FIRE": true,
+    "TOTAL-SUDDEN-DEATHS": true,
+    "TOTAL-POISONING": true,
+		'OTHER': true
+};
+var animation_duration = 500;
+var matrix_width = $( window ).width();
+var matrix_height = $( window ).height();
+var matrix_dimension = {
+    width: matrix_width / 2.35,
+    height: 650,
+    top: 55,
+    left: 0,
+}
+var stream_margin = {
+        top: 200,
+        right: 20,
+        bottom: 30,
+        left: 200
+    },
+    stream_width = 700 - stream_margin.left - stream_margin.right,
+    stream_height = 500 - stream_margin.top - stream_margin.bottom;
+var hover_detect = false; //variable which handles hover detection in d3
+var hover_label;
+var keys;
+
+var x = d3.time.scale()
+    .range([0, stream_width]);
+
+var y = d3.scale.linear()
+    .range([stream_height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(function(d, i) {
+        return 2001 + parseInt(i);
+    });
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+
+var area = d3.svg.area()
+    .x(function(d) {
+        return x(String(d.date));
+    })
+    .y0(function(d) {
+        return y(d.y0);
+    })
+    .y1(function(d) {
+        return y(d.y0 + d.y);
+    });
+
+var stream_stack = d3.layout.stack()
+    .values(function(d) {
+        return d.values;
+    });
+
+var svg = d3.select("#matrix").append("svg").attr("width", matrix_width).attr("height", matrix_height);
+
+var tooltip = d3.select("body")
+    .append("div")
+    .attr('class', 'd3-tip')
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .style("font", "14px 'Helvetica', 'Arial', sans-serif")
+    .style('font-size', '12')
+    .style('font-weight', 'bold')
+    .style("fill", '#808080');
+
+d3.csv("data/raw.csv", function(raw_data) {
+		total_data = raw_data;
+    var stream_data_dummy = {
+        'YEAR': 2001,
+        'JAMMU & KASHMIR': 0,
+        "PUNJAB": 0,
+        'HIMACHAL PRADESH': 0,
+        "UTTARAKHAND": 0,
+        "HIMACHAL PRADESH": 0,
+        "RAJASTHAN": 0,
+        "HARYANA": 0,
+        "UTTAR PRADESH": 0,
+        "SIKKIM": 0,
+        "ASSAM": 0,
+        "ARUNACHAL PRADESH": 0,
+        "MEGHALAYA": 0,
+        "MANIPUR": 0,
+        "NAGALAND": 0,
+        "MIZORAM": 0,
+        "GUJARAT": 0,
+        "MADHYA PRADESH": 0,
+        "CHHATTISGARH": 0,
+        "JHARKHAND": 0,
+        "MAHARASHTRA": 0,
+        "BIHAR": 0,
+        "WEST BENGAL": 0,
+        'ODISHA': 0,
+        "KERALA": 0,
+        "TAMIL NADU": 0,
+        "KARNATAKA": 0,
+        "ANDHRA PRADESH": 0,
+        "GOA": 0,
+        "A & N ISLANDS": 0,
+        "PUDUCHERRY": 0,
+        "LAKSHADWEEP": 0,
+        "TRIPURA": 0,
+        "D & N HAVELI": 0,
+        "DAMAN & DIU": 0,
+        "DELHI(UT)": 0,
+        "CHANDIGARH": 0
+    };
+    stream_data = [];
+    chart_data = {
+        'JAMMU & KASHMIR': [],
+        "PUNJAB": [],
+        'HIMACHAL PRADESH': [],
+        "UTTARAKHAND": [],
+        "HIMACHAL PRADESH": [],
+        "RAJASTHAN": [],
+        "HARYANA": [],
+        "UTTAR PRADESH": [],
+        "SIKKIM": [],
+        "ASSAM": [],
+        "ARUNACHAL PRADESH": [],
+        "MEGHALAYA": [],
+        "MANIPUR": [],
+        "NAGALAND": [],
+        "MIZORAM": [],
+        "GUJARAT": [],
+        "MADHYA PRADESH": [],
+        "CHHATTISGARH": [],
+        "JHARKHAND": [],
+        "MAHARASHTRA": [],
+        "BIHAR": [],
+        "WEST BENGAL": [],
+        'ODISHA': [],
+        "KERALA": [],
+        "TAMIL NADU": [],
+        "KARNATAKA": [],
+        "ANDHRA PRADESH": [],
+        "GOA": [],
+        "A & N ISLANDS": [],
+        "PUDUCHERRY": [],
+        "LAKSHADWEEP": [],
+        "TRIPURA": [],
+        "D & N HAVELI": [],
+        "DAMAN & DIU": [],
+        "DELHI(UT)": [],
+        "CHANDIGARH": []
+    };
+
+    for (var i = 0; i < Object.keys(color).length; i++) {
+        for (var j = 0; j < 13; j++) {
+            chart_data[Object.keys(color)[i]].push(0);
+        }
+    }
+
+    raw_data.forEach(function(d) {
+        try {
+            if ((word_active)[d['CAUSE'].replace(' ', '-').replace('/', '-')
+                    .replace(' ', '-').replace(' ', '-')
+                    .replace(' ', '-').replace(' ', '-')
+                    .replace(' ', '-').replace('.', '')
+                    .replace('(', '-').replace(')', '-')]) {
+                chart_data[d['STATE/UT']][parseInt(d['YEAR']) - 2001] += parseInt(d['TOTAL KILLED']);
+            }
+        } catch (err) {
+
+        }
+    });
+
+    for (var j = 0; j < 13; j++) {
+        stream_data_dummy['YEAR'] = String(j + 2001);
+        for (var i = 0; i < Object.keys(color).length; i++) {
+            stream_data_dummy[Object.keys(color)[i]] = chart_data[Object.keys(color)[i]][j];
+        }
+        stream_data.push(JSON.parse(JSON.stringify(stream_data_dummy)));
+    }
+    matrix_draw(chart_data);
+    stream_draw(stream_data);
+});
+
+$('.accident-type').click(function() {
+    var id = $(this).attr('id');
+    if (id == 'select-all') {
+        $("#" + id).css("background-color", "#2b2b2b");
+    } else {
+        $("#" + "select-all").css("background-color", "#808080");
+    }
+    for (i in word_active) {
+        if (id == 'select-all') {
+            word_active[i] = true;
+            $("#" + i).css("background-color", "#bfbfbf");
+        } else if (i == id) {
+            word_active[i] = true;
+            $("#" + i).css("background-color", "#2b2b2b");
+        } else {
+            word_active[i] = false;
+            $("#" + i).css("background-color", "#bfbfbf");
+        }
+    }
+    update_data();
+});
+
+function update_data() {
+        var stream_data_dummy = {
+            'YEAR': 2001,
+            'JAMMU & KASHMIR': 0,
+            "PUNJAB": 0,
+            'HIMACHAL PRADESH': 0,
+            "UTTARAKHAND": 0,
+            "HIMACHAL PRADESH": 0,
+            "RAJASTHAN": 0,
+            "HARYANA": 0,
+            "UTTAR PRADESH": 0,
+            "SIKKIM": 0,
+            "ASSAM": 0,
+            "ARUNACHAL PRADESH": 0,
+            "MEGHALAYA": 0,
+            "MANIPUR": 0,
+            "NAGALAND": 0,
+            "MIZORAM": 0,
+            "GUJARAT": 0,
+            "MADHYA PRADESH": 0,
+            "CHHATTISGARH": 0,
+            "JHARKHAND": 0,
+            "MAHARASHTRA": 0,
+            "BIHAR": 0,
+            "WEST BENGAL": 0,
+            'ODISHA': 0,
+            "KERALA": 0,
+            "TAMIL NADU": 0,
+            "KARNATAKA": 0,
+            "ANDHRA PRADESH": 0,
+            "GOA": 0,
+            "A & N ISLANDS": 0,
+            "PUDUCHERRY": 0,
+            "LAKSHADWEEP": 0,
+            "TRIPURA": 0,
+            "D & N HAVELI": 0,
+            "DAMAN & DIU": 0,
+            "DELHI(UT)": 0,
+            "CHANDIGARH": 0
+        };
+        stream_data = [];
+        for (var i = 0; i < Object.keys(color).length; i++) {
+            for (var j = 0; j < 13; j++) {
+                chart_data[Object.keys(color)[i]][j] = 0;
+            }
+        }
+
+        total_data.forEach(function(d) {
+            try {
+                if ((word_active)[d['CAUSE'].replace(' ', '-').replace('/', '-')
+                        .replace(' ', '-').replace(' ', '-')
+                        .replace(' ', '-').replace(' ', '-')
+                        .replace(' ', '-').replace('.', '')
+                        .replace('(', '-').replace(')', '-')]) {
+                    chart_data[d['STATE/UT']][parseInt(d['YEAR']) - 2001] += parseInt(d['TOTAL KILLED']);
+                }
+            } catch (err) {
+
+            }
+        });
+
+        for (var j = 0; j < 13; j++) {
+            stream_data_dummy['YEAR'] = String(j + 2001);
+            for (var i = 0; i < Object.keys(color).length; i++) {
+                stream_data_dummy[Object.keys(color)[i]] = chart_data[Object.keys(color)[i]][j];
+            }
+            stream_data.push(JSON.parse(JSON.stringify(stream_data_dummy)));
+        }
+        update_stream(stream_data);
+        update_matrix(chart_data);
+
+}
+
+function matrix_draw(chart_data) {
+
+    svg.append('rect')
+        .attr('x', matrix_dimension.left)
+        .attr('y', matrix_dimension.top)
+        .attr('width', matrix_dimension.width)
+        .attr('height', matrix_dimension.height)
+        .attr('fill', "#fff");
+
+    labels = svg.append("g");
+
+    for (var i = 0; i < 13; i++) {
+      hover_label =	labels.append('text')
+            .attr('x', (i * matrix_dimension.width / 13) + matrix_dimension.left + (matrix_dimension.width / 26))
+            .attr('y', matrix_dimension.top - 30)
+            .attr('class', i)
+            .style("font", "13px 'Helvetica', 'Arial', sans-serif")
+						.style("font-weight", "bold")
+						.style('text-anchor', 'middle')
+            .style("cursor", 'default')
+            .style("fill", '#808080')
+						.text((i + 2001))
+            .on('mouseover', function() {
+								if(!hover_detect){
+									hover_detect = true;
+								}
+								d3.select(this).style('fill', '#808080').style("font-size", "13px");
+								var j = parseInt(this.getAttribute('class'));
+                for (var i = 0; i < Object.keys(color).length; i++) {
+                    d3.selectAll((circles[13 * i + j][0]))
+                        .transition()
+                        .style('visibility', 'hidden');
+
+                    ($(text_labels[13 * i + j][0]))
+                    .css('visibility', 'visible');
+
+                }
+								line_tips[4*j].transition().duration(animation_duration).attr('stroke', '#000000').attr('y1', -100);
+								line_tips[4*j + 1].transition().duration(animation_duration).attr('fill', '#000000').attr('r', 4);
+								line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#000000').attr('y', -100).attr('width', 100).attr('height', 40).attr('x', function(){
+									if(j > 10){
+										return j * ((480) / 12) - 100;
+									}
+									else{
+										return (j * ((480) / 12)) - 1
+									}
+								});
+								line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -70).style('font-size', '25px').attr('x', function(){
+									if(j > 10){
+										return ((j)*(480) / 12) + 5 - 100;
+									}
+									else{
+										return (j)*(480) / 12 + 5;
+									}
+								});
+						})
+            .on('mouseout', function() {
+								var j = parseInt(this.getAttribute('class'))
+                for (var i = 0; i < Object.keys(color).length; i++) {
+                    d3.selectAll((circles[13 * i + j][0]))
+                        .transition()
+                        .style('visibility', 'visible');
+
+                    ($(text_labels[13 * i + j][0]))
+                    .css('visibility', 'hidden');
+                }
+
+								line_tips[4*j].transition().duration(animation_duration).attr('stroke', '#808080').attr('y1', -20);
+								line_tips[4*j + 1].transition().duration(animation_duration).attr('fill', '#555555').attr('r', 2.5);
+								line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#555555').attr('y', -35).attr('width', (460) / 12).attr('height', 20).attr('x', (j * ((480) / 12)) - 1);
+								line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -20).attr('x', ((j)*(480) / 12)).style('font-size', '11px');
+					  });
+    }
+    for (var i = 0; i < Object.keys(color).length; i++) {
+        labels.append('text')
+            .attr('y', i * matrix_dimension.height / Object.keys(color).length + matrix_dimension.top)
+            .attr('x', matrix_dimension.left + matrix_dimension.width)
+            .attr('id', Object.keys(color)[i])
+            .style("text-align", "left")
+            .style("font", "13px 'Helvetica', 'Arial', sans-serif")
+						.style('font-weight', 'bold')
+            .style('fill', color[Object.keys(color)[i]])
+            .style("cursor", 'default')
+						.text(Object.keys(color)[i])
+            .on('mouseover', function() {
+                for (var i = 0; i < Object.keys(color).length; i++) {
+                    if (Object.keys(color)[i] == this.getAttribute('id')) {
+                        for (var j = 0; j < 13; j++) {
+                            d3.selectAll((circles[13 * i + j][0]))
+                                .transition()
+                                .style('visibility', 'hidden');
+
+                            ($(text_labels[13 * i + j][0]))
+                            .css('visibility', 'visible');
+
+                        }
+                    }
+                }
+								for(var i in keys){
+									if(keys[i] != this.id){
+										d3.select(area_stack[0][i]).transition().duration(animation_duration).style('fill', '#808080')
+									}
+								}
+            })
+            .on('mouseout', function() {
+                for (var i = 0; i < Object.keys(color).length; i++) {
+                    if (Object.keys(color)[i] == this.getAttribute('id')) {
+                        for (var j = 0; j < 13; j++) {
+
+                            d3.selectAll((circles[13 * i + j][0]))
+                                .transition()
+                                .style('visibility', 'visible');
+
+                            ($(text_labels[13 * i + j][0]))
+                            .css('visibility', 'hidden');
+
+                        }
+                    }
+                }
+								for(var i in keys){
+										d3.select(area_stack[0][i]).transition().duration(animation_duration).style('fill', color[keys[i]])
+								}
+            });
+    }
+
+    for (var i = 0; i < Object.keys(color).length; i++) {
+        for (var j = 0; j < 13; j++) {
+            circles.push(svg.append('circle')
+                .attr('cx', (j * matrix_dimension.width / 13) + matrix_dimension.left + (matrix_dimension.width / 26))
+                .attr('cy', (i * matrix_dimension.height / Object.keys(color).length) + matrix_dimension.top - 2)
+                .attr('r', function() {
+                    if (chart_data[Object.keys(color)[i]][j] == 0) {
+                        return 0;
+                    }
+                    var scale = d3.scale.linear().domain([d3.min(chart_data[Object.keys(color)[i]]),
+                        d3.max(chart_data[Object.keys(color)[i]])
+                    ]).range([1, 8]);
+                    return scale(chart_data[Object.keys(color)[i]][j]);
+                })
+                .attr('fill', color[Object.keys(color)[i]]));
+
+            text_labels.push(svg.append('text')
+                .attr('y', (i * matrix_dimension.height / Object.keys(color).length) + matrix_dimension.top)
+                .attr('x', (j * matrix_dimension.width / 13) + matrix_dimension.left + (matrix_dimension.width / 26))
+                .attr('class', Object.keys(color)[i])
+                .style("text-anchor", "middle")
+                .style("font", "13px 'Helvetica', 'Arial', sans-serif")
+								.style('font-weight', 'bold')
+                .style("visibility", "hidden")
+                .style('fill', color[Object.keys(color)[i]])
+								.text(chart_data[Object.keys(color)[i]][j]))
+        }
+    }
+}
+
+function update_matrix(chart_data) {
+    for (var i = 0; i < Object.keys(color).length; i++) {
+        for (var j = 0; j < 13; j++) {
+            d3.selectAll((circles[13 * i + j][0]))
+                .transition()
+                .attr('r', function() {
+                    if (chart_data[Object.keys(color)[i]][j] == 0) {
+                        return 0;
+                    }
+                    var scale = d3.scale.linear().domain([d3.min(chart_data[Object.keys(color)[i]]),
+                        d3.max(chart_data[Object.keys(color)[i]])
+                    ]).range([1, 8]);
+                    return scale(chart_data[Object.keys(color)[i]][j]);
+                });
+
+            ($(text_labels[13 * i + j][0]))
+            .text(chart_data[Object.keys(color)[i]][j]);
+        }
+    }
+}
+
+function stream_draw(data) {
+
+    var sum_chart_data = {
+        'JAMMU & KASHMIR': 0,
+        "PUNJAB": 0,
+        'HIMACHAL PRADESH': 0,
+        "UTTARAKHAND": 0,
+        "HIMACHAL PRADESH": 0,
+        "RAJASTHAN": 0,
+        "HARYANA": 0,
+        "UTTAR PRADESH": 0,
+        "SIKKIM": 0,
+        "ASSAM": 0,
+        "ARUNACHAL PRADESH": 0,
+        "MEGHALAYA": 0,
+        "MANIPUR": 0,
+        "NAGALAND": 0,
+        "MIZORAM": 0,
+        "GUJARAT": 0,
+        "MADHYA PRADESH": 0,
+        "CHHATTISGARH": 0,
+        "JHARKHAND": 0,
+        "MAHARASHTRA": 0,
+        "BIHAR": 0,
+        "WEST BENGAL": 0,
+        'ODISHA': 0,
+        "KERALA": 0,
+        "TAMIL NADU": 0,
+        "KARNATAKA": 0,
+        "ANDHRA PRADESH": 0,
+        "GOA": 0,
+        "A & N ISLANDS": 0,
+        "PUDUCHERRY": 0,
+        "LAKSHADWEEP": 0,
+        "TRIPURA": 0,
+        "D & N HAVELI": 0,
+        "DAMAN & DIU": 0,
+        "DELHI(UT)": 0,
+        "CHANDIGARH": 0
+    }; // stores the sum of deaths across all years
+    var sum_year_data = []; // stores the sum of all categories for one year
+
+    for (var j = 0; j < 13; j++) { // sum chart data
+        var year_sum = 0;
+        for (var i = 0; i < Object.keys(color).length; i++) {
+            sum_chart_data[Object.keys(color)[i]] += data[j][Object.keys(color)[i]];
+            year_sum += data[j][Object.keys(color)[i]];
+        }
+        sum_year_data.push(year_sum);
+    }
+
+    keys = Object.keys(sum_chart_data);
+    keys.sort(function(a, b) {
+        return sum_chart_data[a] - sum_chart_data[b];
+    });
+
+    var browsers = stream_stack(keys.reverse().map(function(name) {
+        return {
+            name: name,
+            values: data.map(function(d) {
+                return {
+                    date: d['YEAR'],
+                    y: d[name] * 1
+                };
+            })
+        };
+    }));
+
+    // Find the value of the day with highest total value
+    var maxDateVal = d3.max(data, function(d) {
+        var vals = d3.keys(d).map(function(key) {
+            return key !== "YEAR" ? d[key] : 0
+        });
+        return d3.sum(vals);
+    });
+
+    // Set domains for axes
+    x.domain(d3.extent(data, function(d) {
+        return d['YEAR'];
+    }));
+    y.domain([0, maxDateVal]);
+
+    var stream_chart = svg.append('g')
+        .attr("width", stream_width + stream_margin.left + stream_margin.right)
+        .attr("height", stream_height + stream_margin.top + stream_margin.bottom)
+        .attr("transform", "translate(" + (matrix_dimension.width + matrix_dimension.left + stream_margin.left) + "," + stream_margin.top + ")");
+
+    var browser = stream_chart.selectAll(".browser")
+        .data(browsers)
+        .enter().append("g")
+        .attr("class", "browser");
+
+    area_stack = browser.append("path")
+        .attr("class", "area")
+        .attr("d", function(d) {
+            return area(d.values);
+        })
+        .style("fill", function(d) {
+            return color[d.name];
+        })
+        .on("mouseover", function(d) {
+						if(event){
+							tooltip.style("visibility", "visible")
+						}
+            tooltip.text(d.name);
+        })
+        .on("mousemove", function(d) {
+            return tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
+        })
+        .on("mouseout", function(d) {
+            return tooltip.style("visibility", "hidden");
+        });
+
+    stream_chart.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + stream_height + ")")
+        .style("font", "9px 'Helvetica', 'Arial', sans-serif")
+        .style('font-weight', 'bold')
+        .style("fill", '#808080')
+        .call(xAxis);
+
+    stream_chart.append("g")
+        .attr("class", "y axis")
+        .style("font", "12px 'Helvetica', 'Arial', sans-serif")
+        .style('font-size', '12')
+        .style('font-weight', 'bold')
+        .style("fill", '#555555')
+        .call(yAxis);
+
+    for (var i = 0; i < 13; i++) {
+        line_tips.push(stream_chart.append('line')
+            .attr('x1', function(d) {
+                return (i * ((480) / 12));
+            })
+            .attr('y1', function(d) {
+                return -20;
+            })
+            .attr('x2', function(d) {
+                return (i * ((480) / 12));
+            })
+            .attr('y2', function(d) {
+                return (1 - (sum_year_data[i] / Math.max(...sum_year_data))) * stream_height;
+            })
+            .attr("stroke-width", 2)
+            .attr("stroke", "#808080"));
+
+        line_tips.push(stream_chart.append('circle')
+            .attr('cx', function(d) {
+                return (i * ((480) / 12));
+            })
+            .attr('cy', function(d) {
+                return (1 - (sum_year_data[i] / Math.max(...sum_year_data))) * stream_height;
+            })
+            .attr("r", 2.5)
+            .attr("fill", "#555555"));
+
+				line_tips.push(
+								stream_chart.append('rect')
+								.attr('width', (460) / 12)
+								.attr('height', 20)
+								.attr('x', (i * ((480) / 12)) - 1)
+								.attr('y', -35)
+								.attr('class', i)
+								.style("font", "11px 'Helvetica', 'Arial', sans-serif")
+								.style("cursor", 'default')
+								.style("font-weight", 'bold')
+								.style("fill", '#555555')
+								.style("text-align", 'left')
+								.text(sum_year_data[i])
+				);
+
+        line_tips.push(
+            stream_chart.append('text')
+            .attr('x', (i * ((480) / 12)))
+            .attr('y', -20)
+            .attr('class', i)
+            .style("font", "11px 'Helvetica', 'Arial', sans-serif")
+            .style("cursor", 'default')
+            .style("font-weight", 'bold')
+            .style("fill", '#fff')
+            .style("text-align", 'left')
+            .text(sum_year_data[i])
+        );
+    }
+}
+
+function update_stream(data) {
+    var sum_chart_data = {
+        'JAMMU & KASHMIR': 0,
+        "PUNJAB": 0,
+        'HIMACHAL PRADESH': 0,
+        "UTTARAKHAND": 0,
+        "HIMACHAL PRADESH": 0,
+        "RAJASTHAN": 0,
+        "HARYANA": 0,
+        "UTTAR PRADESH": 0,
+        "SIKKIM": 0,
+        "ASSAM": 0,
+        "ARUNACHAL PRADESH": 0,
+        "MEGHALAYA": 0,
+        "MANIPUR": 0,
+        "NAGALAND": 0,
+        "MIZORAM": 0,
+        "GUJARAT": 0,
+        "MADHYA PRADESH": 0,
+        "CHHATTISGARH": 0,
+        "JHARKHAND": 0,
+        "MAHARASHTRA": 0,
+        "BIHAR": 0,
+        "WEST BENGAL": 0,
+        'ODISHA': 0,
+        "KERALA": 0,
+        "TAMIL NADU": 0,
+        "KARNATAKA": 0,
+        "ANDHRA PRADESH": 0,
+        "GOA": 0,
+        "A & N ISLANDS": 0,
+        "PUDUCHERRY": 0,
+        "LAKSHADWEEP": 0,
+        "TRIPURA": 0,
+        "D & N HAVELI": 0,
+        "DAMAN & DIU": 0,
+        "DELHI(UT)": 0,
+        "CHANDIGARH": 0
+    }; // stores the sum of deaths across all years
+    var sum_year_data = []; // stores the sum of all categories for one year
+
+    for (var j = 0; j < 13; j++) { // sum chart data
+        var year_sum = 0;
+        for (var i = 0; i < Object.keys(color).length; i++) {
+            sum_chart_data[Object.keys(color)[i]] += data[j][Object.keys(color)[i]];
+            year_sum += data[j][Object.keys(color)[i]];
+        }
+        sum_year_data.push(year_sum);
+    }
+
+    keys = Object.keys(sum_chart_data);
+    keys.sort(function(a, b) {
+        return sum_chart_data[a] - sum_chart_data[b];
+    });
+
+    var browsers = stream_stack(keys.reverse().map(function(name) {
+        return {
+            name: name,
+            values: data.map(function(d) {
+                return {
+                    date: d['YEAR'],
+                    y: d[name] * 1
+                };
+            })
+        };
+    }));
+
+    // Find the value of the day with highest total value
+    var maxDateVal = d3.max(data, function(d) {
+        var vals = d3.keys(d).map(function(key) {
+            return key !== "YEAR" ? d[key] : 0
+        });
+        return d3.sum(vals);
+    });
+
+    // Set domains for axes
+    x.domain(d3.extent(data, function(d) {
+        return d['YEAR'];
+    }));
+    y.domain([0, maxDateVal]);
+
+    area_stack
+        .data(browsers)
+        .transition()
+        .duration(animation_duration)
+        .attr("d", function(d) {
+            return area(d.values);
+        })
+        .style("fill", function(d) {
+            return color[d.name];
+        });
+
+    svg.selectAll("g .x.axis")
+        .call(xAxis);
+
+    svg.selectAll("g .y.axis")
+        .call(yAxis);
+
+    for (var i = 0; i < 52; i = i + 4) {
+        line_tips[i]
+            .transition()
+            .duration(animation_duration)
+            .attr('y2', function(d) {
+                return (1 - (sum_year_data[i / 4] / Math.max(...sum_year_data))) * stream_height;
+            });
+
+        line_tips[i + 1]
+            .transition()
+            .duration(animation_duration)
+            .attr('cy', function(d) {
+                return (1 - (sum_year_data[i / 4] / Math.max(...sum_year_data))) * stream_height;
+            });
+
+        line_tips[i + 3]
+            .text(sum_year_data[i / 4]);
+
+    }
+
+}
+
+setInterval(function(){
+	if(!hover_detect){
+		hover_label.transition().duration(500).style('fill', function(){
+			if(hover_label.style("fill") == 'rgb(43, 131, 186)'){
+				return '#808080';
+			} else{
+				return '#2b83ba';
+			}
+		})
+		.style('font-size', function(){
+			if(hover_label.style("fill") == 'rgb(43, 131, 186)'){
+				return '13px';
+			} else{
+				return '14px';
+			}
+		});
+	} else{
+		hover_label.style('fill', '#808080').style("font-size", "13px");
+	}
+
+}, 500);
+d3.selection.prototype.moveToFront = function() {
+    return this.each(function() {
+        this.parentNode.appendChild(this);
+    });
+};
+
+</script>
+</body>
+</html>

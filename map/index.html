@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- India State Map  -->
+    <title>India Map</title>
+
+    <!--  Scripts  -->
+    <script src="../scripts/d3.v4.js"></script>
+    <script type="text/javascript" src="../scripts/d3.geo.min.js"></script>
+    <script src="../scripts/jquery-3.1.1.min.js"></script>
+    <script src="../noUiSlider.9.1.0/nouislider.js"></script>
+    <link rel="stylesheet" href="../noUiSlider.9.1.0/nouislider.css" />
+    <!--  Styles  -->
+    <style type="text/css">
+
+    @font-face {
+      font-family: "Helvetica Neue";
+      src: url(../helveticaneue/HelveticaNeue Medium.ttf.ttf) format("truetype");
+    }
+    body{
+      font: 14px 'Helvetica', 'Arial', sans-serif;
+      font-weight: bold;
+      text-align: center;
+    }
+
+      .accident-type{
+      	border-radius: 4px;
+      	border: none;
+      	color: white;
+      	padding: 5px 10px;
+      	text-align: center;
+      	text-decoration: none;
+      	display: inline-block;
+      	font-size: 16px;
+      	margin: 4px 2px;
+      	cursor: pointer;
+      	background: #bfbfbf;
+      	font: 14px 'Helvetica', 'Arial', sans-serif;
+      	font-weight: bold;
+      }
+
+      .d3-tip {
+        line-height: 1;
+        font-weight: bold;
+        padding: 12px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 2px;
+      }
+      /* Style northward tooltips differently */
+      .d3-tip.n:after {
+        margin: -1px 0 0 0;
+        top: 100%;
+        left: 0;
+      }
+
+      #play{
+        position: absolute;
+      	margin-left: 52%;
+      	bottom: -15px;
+      	opacity: 0.6;
+        cursor:pointer;
+      }
+
+button:focus {outline:0;}
+    </style>
+  </head>
+
+<body>
+  <div class="container" style="margin-top: 20px;">
+  				<div class="row">
+  						<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+  								<div class="post-preview">
+  										<button class="accident-type" id="select-all" style="background:#bb0003;">ALL</button>
+                      <button class="accident-type" id="ABORTIONS-CHILD-BIRTH">ABORTIONS/CHILD BIRTH</button>
+                      <button class="accident-type" id="TOTAL-DROWNING">DROWNING</button>
+  										<button class="accident-type" id="ELECTROCUTION">ELECTROCUTION</button>
+                      <button class="accident-type" id="EPILEPTIC-FITS-GIDDINESS">EPILEPTIC FITS</button>
+                      <button class="accident-type" id="FIRE-ARMS">FIRE ARMS</button>
+                      <button class="accident-type" id="TOTAL-FIRE">FIRE</button>
+                      <button class="accident-type" id="TOTAL-FALLS">FALLS</button>
+                      <button class="accident-type" id="FOOD-POISIONING-ACCIDENTAL-INTAKE-OF-INSECTICIDES-ETC">FOOD POISIONING</button>
+  										<button class="accident-type" id="GAS-CYLINDER-STOVE-BURST">GAS CYLINDER</button>
+  										<button class="accident-type" id="SUDDEN-DEATHS-HEART-ATTACKS-">HEART ATTACKS</button>
+  										<button class="accident-type" id="INFLUENCE-OF-ALCOHOL">INFLUENCE OF ALCOHOL</button>
+                      <button class="accident-type" id="OTHER">OTHER</button>
+                      <button class="accident-type" id="TOTAL-POISONING">POISONING</button>
+                      <button class="accident-type" id="OTHER-RAILWAY-ACCIDENTS">RAILWAY ACCIDENTS</button>
+  										<button class="accident-type" id="SNAKE-BITE-ANIMAL-BITE">SNAKE/ANIMAL BITE</button>
+  										<button class="accident-type" id="TOTAL-SUDDEN-DEATHS">SUDDEN DEATHS</button>
+  									</div>
+  								<hr>
+  						</div>
+  				</div>
+  		</div>
+  <div id="map"></div>
+
+  <div class="section">
+  			<div id="year-slider" style="width: 50%; margin-left: 25%; margin-right: 25%;">
+          <img id="play" width="40px" height="40px" src="images/play.png"/>
+        </div>
+  </div>
+
+  <script type="text/javascript">
+    var w = 600;
+    var proj = d3.geo.mercator();
+    var path = d3.geo.path().projection(proj);
+    var color = {
+        "ANDHRA PRADESH": "#fdae61",
+        "ARUNACHAL PRADESH": "#f89f5f",
+        "ASSAM": "#f48f5d",
+        "BIHAR": "#ef805b",
+        "CHHATTISGARH": "#ea7159",
+        "GOA": "#e86958",
+        "GUJARAT": "#e66157",
+        "HARYANA": "#e15255",
+        'HIMACHAL PRADESH': "#dd5e5c",
+        'JAMMU & KASHMIR': "#d47569",
+        "JHARKHAND": "#ca8c76",
+        "KARNATAKA": "#c1a383",
+        "KERALA": "#b8ba90",
+        "MADHYA PRADESH": "#b0d19d",
+        "MAHARASHTRA": "#abdda4",
+        "MANIPUR": "#a0d5a6",
+        "MEGHALAYA": "#8bc7aa",
+        "MIZORAM": "#76b7ad",
+        "NAGALAND": '#60a8b1',
+        'ODISHA': "#4b9ab4",
+        "PUNJAB": '#368bb8',
+        "RAJASTHAN": "#2b83ba",
+        "SIKKIM": "#2778ab",
+        "TAMIL NADU": "#20628b",
+        "TRIPURA": "#194c6d",
+        "UTTAR PRADESH": "#12374e",
+        "UTTARAKHAND": "#0b212e",
+        "WEST BENGAL": "#040b0f",
+        "A & N ISLANDS": "#000000",
+        "CHANDIGARH": "#151515",
+        "D & N HAVELI": "#2b2b2b",
+        "DAMAN & DIU": "#404040",
+        "DELHI(UT)": "#555555",
+        "LAKSHADWEEP": "#6a6a6a",
+        "PUDUCHERRY": "#808080"
+    };
+    var text_labels = [];
+    var chart_data, total_data, map_json, stepSlider;
+    var word_active = {
+        'ELECTROCUTION': true,
+        'GAS-CYLINDER-STOVE-BURST': true,
+        'FIRE-ARMS': true,
+        "SUDDEN-DEATHS-HEART-ATTACKS-": true,
+        "EPILEPTIC-FITS-GIDDINESS": true,
+        "ABORTIONS-CHILD-BIRTH": true,
+        "INFLUENCE-OF-ALCOHOL": true,
+        "FOOD-POISIONING-ACCIDENTAL-INTAKE-OF-INSECTICIDES-ETC": true,
+        "SNAKE-BITE-ANIMAL-BITE": true,
+        "OTHER-RAILWAY-ACCIDENTS": true,
+        "TOTAL-DROWNING": true,
+        "TOTAL-FALLS": true,
+        "TOTAL-FIRE": true,
+        "TOTAL-SUDDEN-DEATHS": true,
+        "TOTAL-POISONING": true,
+        "OTHER": true
+    };
+    var animation_duration = 500;
+    var category_color = {
+      'ALL' : '#bb0003',
+      'ELECTROCUTION': '#00abc7',
+      'GAS-CYLINDER-STOVE-BURST': '#d3bb9c',
+      'FIRE-ARMS': '#eb5201',
+      "SUDDEN-DEATHS-HEART-ATTACKS-": '#feb53d',
+      "EPILEPTIC-FITS-GIDDINESS": '#8eb572',
+      "ABORTIONS-CHILD-BIRTH": '#6a3d9a',
+      "INFLUENCE-OF-ALCOHOL": '#19868f',
+      "FOOD-POISIONING-ACCIDENTAL-INTAKE-OF-INSECTICIDES-ETC": '#feb53d',
+      "SNAKE-BITE-ANIMAL-BITE": '#6a3d9a',
+      "OTHER-RAILWAY-ACCIDENTS": '#1f78b4',
+      "TOTAL-DROWNING": '#01667f',
+      "TOTAL-FALLS": '#f3ba00',
+      "TOTAL-FIRE": '#e4002f',
+      "TOTAL-SUDDEN-DEATHS": '#b15928',
+      "TOTAL-POISONING": '#19868f',
+      "OTHER": '#6a3d9a',
+    };
+    var tooltip = d3.select("body")
+        .append("foreignObject")
+        .attr('class', 'd3-tip')
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        .style("font", "14px 'Helvetica', 'Arial', sans-serif")
+        .style('font-size', '12')
+        .style('font-weight', 'bold')
+        .style('text-align', 'left')
+        .style("fill", '#808080');
+    var slider_value = 1;
+    var playing = 0;
+
+    var current_year = 0;
+    var map = d3.select("#map").append("svg:svg")
+        .attr("width", w)
+        .attr("height", w)
+        .call(initialize)
+        .style('stroke', '#0f1c08')
+        .style('stroke-width', 1);
+
+    var color_legend_color, color_legend_axis = [];
+    var india = map.append("svg:g")
+        .attr("id", "india");
+    var category = 'ALL';
+    var color_legend = india.append("svg")
+                        .attr('y', w*0.7)
+                        .attr('x', w*0.6)
+                        .attr("width", 200)
+                        .attr("height", 200);
+
+    var legend = india.append('g').append("defs").append("svg:linearGradient")
+        .attr("id", "gradient")
+        .attr("x1", "100%")
+        .attr("y1", "0%")
+        .attr("x2", "100%")
+        .attr("y2", "100%")
+        .attr("spreadMethod", "pad");
+
+    var legend_final_color = legend.append("stop").attr("offset", "0%").attr("stop-color", "#bb0003").attr("stop-opacity", 1);
+
+    var legend_start_color = legend.append("stop").attr("offset", "100%").attr("stop-color", "#bb0003").attr("stop-opacity", 0.2);
+
+    var y = d3.scaleLinear().range([100, 0]);
+
+    d3.csv("data/raw.csv", function(raw_data) {
+        total_data = raw_data;
+        chart_data = {
+            'JAMMU & KASHMIR': [],
+            "PUNJAB": [],
+            'HIMACHAL PRADESH': [],
+            "UTTARAKHAND": [],
+            "HIMACHAL PRADESH": [],
+            "RAJASTHAN": [],
+            "HARYANA": [],
+            "UTTAR PRADESH": [],
+            "SIKKIM": [],
+            "ASSAM": [],
+            "ARUNACHAL PRADESH": [],
+            "MEGHALAYA": [],
+            "MANIPUR": [],
+            "NAGALAND": [],
+            "MIZORAM": [],
+            "GUJARAT": [],
+            "MADHYA PRADESH": [],
+            "CHHATTISGARH": [],
+            "JHARKHAND": [],
+            "MAHARASHTRA": [],
+            "BIHAR": [],
+            "WEST BENGAL": [],
+            'ODISHA': [],
+            "KERALA": [],
+            "TAMIL NADU": [],
+            "KARNATAKA": [],
+            "ANDHRA PRADESH": [],
+            "GOA": [],
+            "A & N ISLANDS": [],
+            "PUDUCHERRY": [],
+            "LAKSHADWEEP": [],
+            "TRIPURA": [],
+            "D & N HAVELI": [],
+            "DAMAN & DIU": [],
+            "DELHI(UT)": [],
+            "CHANDIGARH": []
+        };
+
+        for (var i = 0; i < Object.keys(color).length; i++) {
+            for (var j = 0; j < 13; j++) {
+                chart_data[Object.keys(color)[i]].push(0);
+            }
+        }
+
+        raw_data.forEach(function(d) {
+            try {
+                if ((word_active)[d['CAUSE'].replace(' ', '-').replace('/', '-')
+                        .replace(' ', '-').replace(' ', '-')
+                        .replace(' ', '-').replace(' ', '-')
+                        .replace(' ', '-').replace('.', '')
+                        .replace('(', '-').replace(')', '-')]) {
+                    chart_data[d['STATE/UT']][parseInt(d['YEAR']) - 2001] += parseInt(d['TOTAL KILLED']);
+                }
+            } catch (err) {
+
+            }
+        });
+
+        stepSlider = document.getElementById('year-slider');
+
+        noUiSlider.create(stepSlider, {
+            start: [0],
+            step: 1,
+            range: {
+                'min': [2001],
+                'max': [2013]
+            },
+            pips: {
+                mode: 'values',
+                values: [2001, 2003, 2005, 2007, 2009, 2011, 2013],
+                density: 8
+            }
+        });
+
+        map_draw(chart_data, 'ALL');
+
+    });
+
+    $('.accident-type').click(function() {
+        var id = $(this).attr('id');
+        if (id == 'select-all') {
+            $("#" + id).css("background-color", "#bb0003");
+            legend_final_color.attr("stop-color", '#bb0003');
+            legend_start_color.attr("stop-color", '#bb0003');
+        } else {
+            $("#" + "select-all").css("background-color", "#808080");
+        }
+        for (i in word_active) {
+            if (id == 'select-all') {
+                word_active[i] = true;
+                $("#" + i).css("background-color", "#bfbfbf");
+            } else if (i == id) {
+                word_active[i] = true;
+                legend_final_color.attr("stop-color", category_color[i]);
+                legend_start_color.attr("stop-color", category_color[i]);
+                $("#" + i).css("background-color", category_color[i]);
+            } else {
+                word_active[i] = false;
+                $("#" + i).css("background-color", "#bfbfbf");
+            }
+        }
+        if(id == 'select-all'){
+          id = 'ALL';
+        }
+        category = id;
+        update_data();
+    });
+
+    function update_data() {
+
+            stream_data = [];
+            for (var i = 0; i < Object.keys(color).length; i++) {
+                for (var j = 0; j < 13; j++) {
+                    chart_data[Object.keys(color)[i]][j] = 0;
+                }
+            }
+
+            total_data.forEach(function(d) {
+                try {
+                    if ((word_active)[d['CAUSE'].replace(' ', '-').replace('/', '-')
+                            .replace(' ', '-').replace(' ', '-')
+                            .replace(' ', '-').replace(' ', '-')
+                            .replace(' ', '-').replace('.', '')
+                            .replace('(', '-').replace(')', '-')]) {
+                        chart_data[d['STATE/UT']][parseInt(d['YEAR']) - 2001] += parseInt(d['TOTAL KILLED']);
+                    }
+                } catch (err) {
+
+                }
+            });
+
+        update_map(chart_data);
+
+    }
+
+    function map_draw(data) {
+      d3.json("data/states.json", function(json) {
+          var year_data = []
+          for (var i = 0; i < Object.keys(color).length; i++) {
+              year_data.push(chart_data[Object.keys(color)[i]][current_year])
+          }
+
+          map_json = json;
+
+          india.selectAll("path")
+              .data(map_json.features)
+              .enter().append("path")
+              .attr("d", path)
+              .attr('fill', function(d){
+                return category_color[category];
+              })
+              .style('opacity', function(d){
+                try{
+                  var scale = d3.scaleLinear().domain([d3.min(year_data),
+                      d3.max(year_data)
+                  ]).range([0.2, 1]);
+                  return scale(data[d.id][current_year]);
+                }
+                catch(err){
+                  return 0.2;
+                }
+              })
+              .on("mouseover", function(d) {
+                  if(event){
+                    tooltip.style("visibility", "visible")
+                  }
+                  tooltip.html(d.id + '<br />' + data[d.id][current_year]);
+              })
+              .on("mousemove", function(d) {
+                  return tooltip.style("top", (event.pageY - 10) + "px").style("left", (event.pageX + 10) + "px");
+              })
+              .on("mouseout", function(d) {
+                  return tooltip.style("visibility", "hidden");
+              });
+
+          color_legend_color = color_legend.append("rect")
+                    .attr("width", 30)
+                    .attr("height", 100)
+                    .attr('x', 70)
+                    .attr('y', 20)
+                    .style('stroke-width', 0.3)
+                    .style("fill", "url(#gradient)");
+
+          for(var i=0; i<5; i++){
+            color_legend_axis.push(color_legend.append("text")
+                .attr('x', 105)
+                .attr('y', function(){
+                  return 32 + i*(100 / 5);
+                })
+                .style("font", "12px 'Helvetica', 'Arial', sans-serif")
+                .style("fill", '#808080')
+                .text(function(){
+                  return Math.round((1 - i/5) * d3.max(year_data) / 100) * 100;
+                }));
+          }
+
+          stepSlider.noUiSlider.on('update', function(values, handle) {
+              current_year = parseInt(values) - 2001;
+              slider_value = parseInt(values);
+              update_data();
+          });
+      });
+    }
+
+    function update_map(data) {
+
+          var year_data = [];
+
+          for (var i = 0; i < Object.keys(color).length; i++) {
+              year_data.push(chart_data[Object.keys(color)[i]][current_year])
+          }
+
+          y.domain([0, d3.max(year_data)]);
+
+          india.selectAll("path")
+              .data(map_json.features)
+              .transition()
+              .duration(animation_duration)
+              .attr("d", path)
+              .attr('fill', function(d){
+                return category_color[category];
+              })
+              .style('opacity', function(d){
+                try{
+                  var scale = d3.scaleLinear().domain([d3.min(year_data),
+                      d3.max(year_data)
+                  ]).range([0.2, 1]);
+                  return scale(data[d.id][current_year]);
+                }
+                catch(err){
+                  return 0.2;
+                }
+              });
+
+           color_legend_color.transition().duration(animation_duration).style("fill", "url(#gradient)");
+
+           for(var i=0; i<5; i++){
+             color_legend_axis[i]
+                 .text(function(){
+                   return Math.round((1 - i/5) * d3.max(year_data) / 100) * 100;
+                 })
+                 .style('stroke', '#555555')
+                 ;
+           }
+    }
+
+    function initialize() {
+        proj.scale(6700);
+        proj.translate([-1240, 720]);
+    }
+
+    setInterval(function(){
+
+    	if (slider_value < 2014 && playing == 1 ) {
+          console.log('here');
+    			stepSlider.noUiSlider.set(slider_value);
+    			slider_value = slider_value + 1;
+    	}
+    	if (slider_value == 2014) {
+    			playing = 2;
+    			document.getElementById("play").src = "images/reset.png";
+    	}
+    }, 500);
+
+    $(document).ready(function() {
+        $('#play').click(function() {
+            if (playing == 0) {
+                playing = 1;
+                document.getElementById("play").src = "images/pause.png";
+            } else if (playing == 1) {
+                playing = 0;
+                document.getElementById("play").src = "images/play.png";
+            } else if (playing == 2) {
+                playing = 1;
+                slider_value = 0;
+    						document.getElementById("play").src = "images/pause.png";
+            }
+        });
+    });
+
+  </script>
+</body>
+</html>
