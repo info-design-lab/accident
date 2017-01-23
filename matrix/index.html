@@ -24,7 +24,7 @@ body{
 	cursor: pointer;
 	background: #bfbfbf;
 	font-family: 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif;
-	font-weight: bold;
+	font-weight: normal;
 }
 .axis path, .axis line {
   fill: none;
@@ -37,7 +37,7 @@ body{
 }
 .d3-tip {
   line-height: 1;
-  font-weight: bold;
+  font-weight: normal;
   padding: 12px;
   background: rgba(0, 0, 0, 0.8);
   color: #fff;
@@ -211,7 +211,7 @@ var tooltip = d3.select("body")
     .style("visibility", "hidden")
     .style("font", "14px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
     .style('font-size', '12')
-    .style('font-weight', 'bold')
+    .style('font-weight', 'normal')
     .style("fill", '#808080');
 
 d3.csv("data/raw.csv", function(raw_data) {
@@ -438,7 +438,7 @@ function matrix_draw(chart_data) {
             .attr('y', matrix_dimension.top - 30)
             .attr('class', i)
             .style("font", "13px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
-						.style("font-weight", "bold")
+						.style("font-weight", "normal")
 						.style('text-anchor', 'middle')
             .style("cursor", 'default')
             .style("fill", '#808080')
@@ -501,7 +501,7 @@ function matrix_draw(chart_data) {
             .attr('id', Object.keys(color)[i])
             .style("text-align", "left")
             .style("font", "13px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
-						.style('font-weight', 'bold')
+						.style('font-weight', 'normal')
             .style('fill', color[Object.keys(color)[i]])
             .style("cursor", 'default')
 						.text(Object.keys(color)[i])
@@ -568,7 +568,7 @@ function matrix_draw(chart_data) {
                 .attr('class', Object.keys(color)[i])
                 .style("text-anchor", "middle")
                 .style("font", "13px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
-								.style('font-weight', 'bold')
+								.style('font-weight', 'normal')
                 .style("visibility", "hidden")
                 .style('fill', color[Object.keys(color)[i]])
 								.text(chart_data[Object.keys(color)[i]][j]))
@@ -714,7 +714,7 @@ function stream_draw(data) {
         .attr("class", "x axis")
         .attr("transform", "translate(0," + stream_height + ")")
         .style("font", "9px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
-        .style('font-weight', 'bold')
+        .style('font-weight', 'normal')
         .style("fill", '#808080')
         .call(xAxis);
 
@@ -722,7 +722,7 @@ function stream_draw(data) {
         .attr("class", "y axis")
         .style("font", "12px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
         .style('font-size', '12')
-        .style('font-weight', 'bold')
+        .style('font-weight', 'normal')
         .style("fill", '#555555')
         .call(yAxis);
 
@@ -762,7 +762,7 @@ function stream_draw(data) {
 								.attr('class', i)
 								.style("font", "11px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
 								.style("cursor", 'default')
-								.style("font-weight", 'bold')
+								.style("font-weight", 'normal')
 								.style("fill", '#555555')
 								.style("text-align", 'left')
 								.text(sum_year_data[i])
@@ -775,7 +775,7 @@ function stream_draw(data) {
             .attr('class', i)
             .style("font", "11px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
             .style("cursor", 'default')
-            .style("font-weight", 'bold')
+            .style("font-weight", 'normal')
             .style("fill", '#fff')
             .style("text-align", 'left')
             .text(sum_year_data[i])

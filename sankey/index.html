@@ -8,7 +8,7 @@
 
 body{
 	font: 14px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif;
-	font-weight: bold;
+	font-weight: normal;
 	text-align: center;
 }
 text{
@@ -158,16 +158,16 @@ function draw(data) {
 
     g = svg.append("g").attr("transform", "translate(400,50)").call(bp);
 
-    g.append("text").attr("x", -100).attr("y", -8).style("text-anchor", "middle").text("States").style("font-weight", 'bold').style('fill', '#808080').style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif");
-    g.append("text").attr("x", sankey_dimension.width + 100).attr("y", -8).style("text-anchor", "middle").text("Cause").style("font-weight", 'bold').style('fill', '#808080').style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif");
+    g.append("text").attr("x", -100).attr("y", -8).style("text-anchor", "middle").text("States").style("font-weight", 'normal').style('fill', '#808080').style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif");
+    g.append("text").attr("x", sankey_dimension.width + 100).attr("y", -8).style("text-anchor", "middle").text("Cause").style("font-weight", 'normal').style('fill', '#808080').style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif");
 
     g.append("line").attr("x1", -100).attr("x2", 0);
     g.append("line").attr("x1", sankey_dimension.width).attr("x2", sankey_dimension.width + 100);
-    g.append("text").attr("x", -5).attr("y", -8).style("text-anchor", "middle").text("%").style("font-weight", 'bold').style('fill', '#808080').style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif");
+    g.append("text").attr("x", -5).attr("y", -8).style("text-anchor", "middle").text("%").style("font-weight", 'normal').style('fill', '#808080').style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif");
 
     g.append("line").attr("y1", 620).attr("y2", 620).attr("x1", -100).attr("x2", 0);
     g.append("line").attr("y1", 620).attr("y2", 620).attr("x1", sankey_dimension.width).attr("x2", sankey_dimension.width + 100);
-    g.append("text").attr("x", sankey_dimension.width + 5).attr("y", -8).style("text-anchor", "middle").text("%").style("font-weight", 'bold').style('fill', '#808080').style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif");
+    g.append("text").attr("x", sankey_dimension.width + 5).attr("y", -8).style("text-anchor", "middle").text("%").style("font-weight", 'normal').style('fill', '#808080').style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif");
 
     g.selectAll(".mainBars")
         .on("mouseover", mouseover);
@@ -181,7 +181,7 @@ function draw(data) {
         .text(d => d.key)
 				.style("font", "14px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
 				.style('font-size', '12')
-				.style('font-weight', 'bold')
+				.style('font-weight', 'normal')
         .attr("text-anchor", d => (d.part == "primary" ? "end" : "start"));
 
     g.selectAll(".mainBars").append("text").attr("class", "perc")
@@ -193,14 +193,14 @@ function draw(data) {
         .style('fill', function(d){
 					return d.part == "primary" ? color[d.key] : '#6a6a6a'
 				}) // '#6a6a6a')
-        .style("font-weight", 'bold')
+        .style("font-weight", 'normal')
         .style("font", "'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
         .attr("text-anchor", d => (d.part == "primary" ? "end" : "start"));
 
     g.selectAll(".mainBars").append("text").attr("class", "val")
         .attr("x", d => (d.part == "primary" ? -45 : 45))
         .attr("y", d => +6)
-        .style("font-weight", 'bold')
+        .style("font-weight", 'normal')
         .text(function(d) {
             return d3.format("100")(d.value)
         })
