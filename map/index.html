@@ -9,16 +9,13 @@
     <script type="text/javascript" src="../scripts/d3.geo.min.js"></script>
     <script src="../scripts/jquery-3.1.1.min.js"></script>
     <script src="../noUiSlider.9.1.0/nouislider.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
     <link rel="stylesheet" href="../noUiSlider.9.1.0/nouislider.css" />
     <!--  Styles  -->
     <style type="text/css">
 
-    @font-face {
-      font-family: "Helvetica Neue";
-      src: url(../helveticaneue/HelveticaNeue Medium.ttf.ttf) format("truetype");
-    }
     body{
-      font: 14px 'Helvetica', 'Arial', sans-serif;
+      font: 14px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif;
       font-weight: bold;
       text-align: center;
     }
@@ -35,7 +32,7 @@
       	margin: 4px 2px;
       	cursor: pointer;
       	background: #bfbfbf;
-      	font: 14px 'Helvetica', 'Arial', sans-serif;
+      	font: 14px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif;
       	font-weight: bold;
       }
 
@@ -188,7 +185,7 @@ button:focus {outline:0;}
         .style("position", "absolute")
         .style("z-index", "10")
         .style("visibility", "hidden")
-        .style("font", "14px 'Helvetica', 'Arial', sans-serif")
+        .style("font", "14px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
         .style('font-size', '12')
         .style('font-weight', 'bold')
         .style('text-align', 'left')
@@ -420,7 +417,7 @@ button:focus {outline:0;}
                 .attr('y', function(){
                   return 32 + i*(100 / 5);
                 })
-                .style("font", "12px 'Helvetica', 'Arial', sans-serif")
+                .style("font", "12px 'Roboto Condensed', 'Helvetica', 'Arial', sans-serif")
                 .style("fill", '#808080')
                 .text(function(){
                   return Math.round((1 - i/5) * d3.max(year_data) / 100) * 100;
