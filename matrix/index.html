@@ -454,9 +454,9 @@ function matrix_draw(chart_data) {
 						}
 						line_tips[4*j].transition().duration(animation_duration).attr('stroke', '#000000').attr('y1', -100);
 						line_tips[4*j + 1].transition().duration(animation_duration).attr('fill', '#000000').attr('r', 4);
-						line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#000000').attr('y', -100).attr('width', 100).attr('height', 40).attr('x', function(){
+						line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#000000').attr('y', -100).attr('width', 90).attr('height', 40).attr('x', function(){
 							if(j > 10){
-								return j * ((480) / 12) - 100;
+								return j * ((480) / 12) - 90;
 							}
 							else{
 								return (j * ((480) / 12)) - 1
@@ -464,7 +464,7 @@ function matrix_draw(chart_data) {
 						});
 						line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -70).style('font-size', '25px').attr('x', function(){
 							if(j > 10){
-								return ((j)*(480) / 12) + 5 - 100;
+								return ((j)*(480) / 12) + 5 - 90;
 							}
 							else{
 								return (j)*(480) / 12 + 5;
@@ -484,7 +484,7 @@ function matrix_draw(chart_data) {
 
 						line_tips[4*j].transition().duration(animation_duration).attr('stroke', '#808080').attr('y1', -20);
 						line_tips[4*j + 1].transition().duration(animation_duration).attr('fill', '#555555').attr('r', 2.5);
-						line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#555555').attr('y', -35).attr('width', (473) / 12).attr('height', 20).attr('x', (j * ((480) / 12)) - 1);
+						line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#555555').attr('y', -35).attr('width', (430) / 12).attr('height', 20).attr('x', (j * ((480) / 12)) - 1);
 						line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -20).attr('x', ((j)*(480) / 12)).style('font-size', '11px');
 				});
 
@@ -511,9 +511,9 @@ function matrix_draw(chart_data) {
                 }
 								line_tips[4*j].transition().duration(animation_duration).attr('stroke', '#000000').attr('y1', -100);
 								line_tips[4*j + 1].transition().duration(animation_duration).attr('fill', '#000000').attr('r', 4);
-								line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#000000').attr('y', -100).attr('width', 100).attr('height', 40).attr('x', function(){
+								line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#000000').attr('y', -100).attr('width', 90).attr('height', 40).attr('x', function(){
 									if(j > 10){
-										return j * ((480) / 12) - 100;
+										return j * ((480) / 12) - 90;
 									}
 									else{
 										return (j * ((480) / 12)) - 1
@@ -521,7 +521,7 @@ function matrix_draw(chart_data) {
 								});
 								line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -70).style('font-size', '25px').attr('x', function(){
 									if(j > 10){
-										return ((j)*(480) / 12) + 5 - 100;
+										return ((j)*(480) / 12) + 5 - 90;
 									}
 									else{
 										return (j)*(480) / 12 + 5;
@@ -541,9 +541,11 @@ function matrix_draw(chart_data) {
 
 								line_tips[4*j].transition().duration(animation_duration).attr('stroke', '#808080').attr('y1', -20);
 								line_tips[4*j + 1].transition().duration(animation_duration).attr('fill', '#555555').attr('r', 2.5);
-								line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#555555').attr('y', -35).attr('width', (473) / 12).attr('height', 20).attr('x', (j * ((480) / 12)) - 1);
+								line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#555555').attr('y', -35).attr('width', (430) / 12).attr('height', 20).attr('x', (j * ((480) / 12)) - 1);
 								line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -20).attr('x', ((j)*(480) / 12)).style('font-size', '11px');
 					  });
+
+
 
     }
     for (var i = 0; i < Object.keys(color).length; i++) {
@@ -807,7 +809,7 @@ function stream_draw(data) {
 
 				line_tips.push(
 								stream_chart.append('rect')
-								.attr('width', (473) / 12)
+								.attr('width', (430) / 12)
 								.attr('height', 20)
 								.attr('x', (i * ((480) / 12)) - 1)
 								.attr('y', -35)
