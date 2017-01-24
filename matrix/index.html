@@ -9,7 +9,6 @@
 body{
 		text-align: center;
 	}
-
 .label{
 		text-align: left;
 }
@@ -436,9 +435,11 @@ function matrix_draw(chart_data) {
 			labels.append('rect')
 				.attr('x', (i * matrix_dimension.width / 13) + matrix_dimension.left)
 				.attr('y', 10)
+				.attr('rx', 5)
+				.attr('ry', 5)
 				.attr('width', matrix_dimension.width / 13 - 2)
 				.attr('height', 20)
-				.attr('fill', '#F0F0F0')
+				.attr('fill', '#bfbfbf')
 				.attr('class', i)
 				.on('mouseover', function() {
 						var j = parseInt(this.getAttribute('class'));
@@ -495,10 +496,9 @@ function matrix_draw(chart_data) {
 						.style("font-weight", "normal")
 						.style('text-anchor', 'middle')
             .style("cursor", 'default')
-            .style("fill", '#808080')
+            .style("fill", 'white')
 						.text((i + 2001))
             .on('mouseover', function() {
-								d3.select(this).style('fill', '#808080').style("font-size", "13px");
 								var j = parseInt(this.getAttribute('class'));
                 for (var i = 0; i < Object.keys(color).length; i++) {
                     d3.selectAll((circles[13 * i + j][0]))
@@ -544,8 +544,6 @@ function matrix_draw(chart_data) {
 								line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#555555').attr('y', -35).attr('width', (473) / 12).attr('height', 20).attr('x', (j * ((480) / 12)) - 1);
 								line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -20).attr('x', ((j)*(480) / 12)).style('font-size', '11px');
 					  });
-
-
 
     }
     for (var i = 0; i < Object.keys(color).length; i++) {
