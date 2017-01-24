@@ -30,12 +30,12 @@ causes = ['OTHER', 'TOTAL SUDDEN DEATHS', 'SUDDEN DEATHS(HEART ATTACKS)', 'TOTAL
 
 for j in state_order:
     for i in data:
-        if i['YEAR'] == 2013 and j == i['STATE/UT']:
+        if i['YEAR'] == 2001 and j == i['STATE/UT']:
             if i['CAUSE'] in causes:
                 year_data.append(i)
 
 keys = year_data[0].keys()
-with open('output.csv', 'w') as output_file:
+with open('2001.csv', 'w') as output_file:
     dict_writer = csv.DictWriter(output_file, keys)
     dict_writer.writeheader()
     dict_writer.writerows(year_data)
