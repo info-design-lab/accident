@@ -5,9 +5,11 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
 </head>
 <style>
+
 body{
 		text-align: center;
 	}
+
 .label{
 		text-align: left;
 }
@@ -148,8 +150,8 @@ var word_active = {
 		'OTHER': true
 };
 var animation_duration = 500;
-var matrix_width = $( window ).width();
-var matrix_height = $( window ).height();
+var matrix_width = 1280;
+var matrix_height = 691;
 var matrix_dimension = {
     width: matrix_width / 2.35,
     height: 650,
@@ -164,8 +166,6 @@ var stream_margin = {
     },
     stream_width = 700 - stream_margin.left - stream_margin.right,
     stream_height = 500 - stream_margin.top - stream_margin.bottom;
-var hover_detect = false; //variable which handles hover detection in d3
-var hover_label;
 var keys;
 
 var x = d3.time.scale()
@@ -433,7 +433,61 @@ function matrix_draw(chart_data) {
     labels = svg.append("g");
 
     for (var i = 0; i < 13; i++) {
-      hover_label =	labels.append('text')
+			labels.append('rect')
+				.attr('x', (i * matrix_dimension.width / 13) + matrix_dimension.left)
+				.attr('y', 10)
+				.attr('width', matrix_dimension.width / 13 - 2)
+				.attr('height', 20)
+				.attr('fill', '#F0F0F0')
+				.attr('class', i)
+				.on('mouseover', function() {
+						var j = parseInt(this.getAttribute('class'));
+						for (var i = 0; i < Object.keys(color).length; i++) {
+								d3.selectAll((circles[13 * i + j][0]))
+										.transition()
+										.style('visibility', 'hidden');
+
+								($(text_labels[13 * i + j][0]))
+								.css('visibility', 'visible');
+
+						}
+						line_tips[4*j].transition().duration(animation_duration).attr('stroke', '#000000').attr('y1', -100);
+						line_tips[4*j + 1].transition().duration(animation_duration).attr('fill', '#000000').attr('r', 4);
+						line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#000000').attr('y', -100).attr('width', 100).attr('height', 40).attr('x', function(){
+							if(j > 10){
+								return j * ((480) / 12) - 100;
+							}
+							else{
+								return (j * ((480) / 12)) - 1
+							}
+						});
+						line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -70).style('font-size', '25px').attr('x', function(){
+							if(j > 10){
+								return ((j)*(480) / 12) + 5 - 100;
+							}
+							else{
+								return (j)*(480) / 12 + 5;
+							}
+						});
+				})
+				.on('mouseout', function() {
+						var j = parseInt(this.getAttribute('class'))
+						for (var i = 0; i < Object.keys(color).length; i++) {
+								d3.selectAll((circles[13 * i + j][0]))
+										.transition()
+										.style('visibility', 'visible');
+
+								($(text_labels[13 * i + j][0]))
+								.css('visibility', 'hidden');
+						}
+
+						line_tips[4*j].transition().duration(animation_duration).attr('stroke', '#808080').attr('y1', -20);
+						line_tips[4*j + 1].transition().duration(animation_duration).attr('fill', '#555555').attr('r', 2.5);
+						line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#555555').attr('y', -35).attr('width', (473) / 12).attr('height', 20).attr('x', (j * ((480) / 12)) - 1);
+						line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -20).attr('x', ((j)*(480) / 12)).style('font-size', '11px');
+				});
+
+      labels.append('text')
             .attr('x', (i * matrix_dimension.width / 13) + matrix_dimension.left + (matrix_dimension.width / 26))
             .attr('y', matrix_dimension.top - 30)
             .attr('class', i)
@@ -444,9 +498,6 @@ function matrix_draw(chart_data) {
             .style("fill", '#808080')
 						.text((i + 2001))
             .on('mouseover', function() {
-								if(!hover_detect){
-									hover_detect = true;
-								}
 								d3.select(this).style('fill', '#808080').style("font-size", "13px");
 								var j = parseInt(this.getAttribute('class'));
                 for (var i = 0; i < Object.keys(color).length; i++) {
@@ -493,6 +544,9 @@ function matrix_draw(chart_data) {
 								line_tips[4*j + 2].transition().duration(animation_duration).style('fill', '#555555').attr('y', -35).attr('width', (473) / 12).attr('height', 20).attr('x', (j * ((480) / 12)) - 1);
 								line_tips[4*j + 3].transition().duration(animation_duration).attr('y', -20).attr('x', ((j)*(480) / 12)).style('font-size', '11px');
 					  });
+
+
+
     }
     for (var i = 0; i < Object.keys(color).length; i++) {
         labels.append('text')
@@ -767,7 +821,6 @@ function stream_draw(data) {
 								.style("text-align", 'left')
 								.text(sum_year_data[i])
 				);
-
         line_tips.push(
             stream_chart.append('text')
             .attr('x', (i * ((480) / 12)))
@@ -903,27 +956,7 @@ function update_stream(data) {
 
 }
 
-setInterval(function(){
-	if(!hover_detect){
-		hover_label.transition().duration(500).style('fill', function(){
-			if(hover_label.style("fill") == 'rgb(43, 131, 186)'){
-				return '#808080';
-			} else{
-				return '#2b83ba';
-			}
-		})
-		.style('font-size', function(){
-			if(hover_label.style("fill") == 'rgb(43, 131, 186)'){
-				return '13px';
-			} else{
-				return '14px';
-			}
-		});
-	} else{
-		hover_label.style('fill', '#808080').style("font-size", "13px");
-	}
 
-}, 500);
 d3.selection.prototype.moveToFront = function() {
     return this.each(function() {
         this.parentNode.appendChild(this);
